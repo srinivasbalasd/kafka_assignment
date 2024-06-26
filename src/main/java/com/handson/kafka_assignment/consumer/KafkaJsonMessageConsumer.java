@@ -1,6 +1,7 @@
 package com.handson.kafka_assignment.consumer;
 
 
+import com.handson.kafka_assignment.model.UserDto;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -18,40 +19,39 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class KafkaMessageConsumer {
+public class KafkaJsonMessageConsumer {
 
     @Autowired
-    private ConsumerFactory<String, String> consumerFactory;
+    private ConsumerFactory<String, UserDto> consumerJsonFactory;
 
 
-    private static final Logger log = LoggerFactory.getLogger(KafkaMessageConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaJsonMessageConsumer.class);
 
-    @Value("${topic.string.name}")
-    private String strTopic;
 
-    public List<String> consumeMessages(int partition, long startOffset, long endOffset) {
-        List<String> messages = new ArrayList<>((int) endOffset - (int) startOffset + 1);
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerFactory.getConfigurationProperties())) {
-            TopicPartition topicPartition = new TopicPartition(strTopic, partition);
+    @Value("${topic.userdto.name}")
+    private String userdtoTopic;
+
+    public List<UserDto> consumeMessages(int partition, long startOffset, long endOffset) {
+        List<UserDto> jsonMessages = new ArrayList<>((int) endOffset - (int) startOffset + 1);
+        try (KafkaConsumer<String, UserDto> consumer = new KafkaConsumer<>(consumerJsonFactory.getConfigurationProperties())) {
+            TopicPartition topicPartition = new TopicPartition(userdtoTopic, partition);
             consumer.assign(Arrays.asList(topicPartition));
             consumer.seek(topicPartition, startOffset);
 
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(5));
-            for (ConsumerRecord<String, String> record : records) {
+            ConsumerRecords<String, UserDto> records = consumer.poll(Duration.ofSeconds(5));
+            for (ConsumerRecord<String, UserDto> record : records) {
                 if (record.offset() > endOffset) {
                     break;
                 }
                 log.info("Consumed message: " + record.value() + ", offset: " + record.offset());
-                messages.add(record.value());
+                jsonMessages.add(record.value());
             }
             consumer.commitAsync();
-            consumer.close();
         } catch (Exception e) {
-            // Log and handle exception
             log.error("Error while consuming messages: " + e.getMessage());
             throw e;
         }
-        return messages;
+        return jsonMessages;
     }
 
 

@@ -1,9 +1,9 @@
 package com.handson.kafka_assignment.controller;
 
 
+
 import com.handson.kafka_assignment.consumer.KafkaMessageConsumer;
 import com.handson.kafka_assignment.producer.KafkaMessageProducer;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class MessageController {
+public class StringMessageController {
+
+
 
     private final KafkaMessageProducer messageProducer;
     private final KafkaMessageConsumer kafkaMessageConsumer;
 
-    public MessageController(KafkaMessageProducer messageProducer, KafkaMessageConsumer kafkaMessageConsumer) {
+    public StringMessageController(KafkaMessageProducer messageProducer, KafkaMessageConsumer kafkaMessageConsumer) {
         this.messageProducer = messageProducer;
         this.kafkaMessageConsumer = kafkaMessageConsumer;
     }
